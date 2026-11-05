@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\HIS.Modules.HoSoBenhAn.Application\HIS.Modules.HoSoBenhAn.Application.csproj" />
+    <ProjectReference Include="..\..\..\HIS.SharedKernel.Infrastructure\HIS.SharedKernel.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
