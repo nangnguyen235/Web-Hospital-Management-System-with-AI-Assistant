@@ -1,0 +1,33 @@
+# Cấu hình Claude Code — dùng cá nhân, không đưa lên Git
+CLAUDE.md
+.claude/
+
+# Công cụ biên dịch báo cáo (Tectonic, cache gói TeX) và PDF đầu ra
+bao-cao/.cong-cu/tectonic/
+bao-cao/.cong-cu/cache/
+bao-cao/.cong-cu/build/
+bao-cao/pdf/
+
+# Bí mật — KHÔNG commit (rule 3)
+.env
+.env.*
+!.env.example
+nginx/certs/
+*.pem
+*.key
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
+TestResults/
+
+# Node / frontend
+node_modules/
+dist/
+frontend/.vite/
+*.local
+
+# Báo cáo .tex — không đưa lên repo công khai (người dùng chốt 2026-11-05)
+bao-cao/
