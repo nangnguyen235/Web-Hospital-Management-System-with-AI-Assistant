@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HIS.Modules.TroLyAi.Application\HIS.Modules.TroLyAi.Application.csproj" />
+    <ProjectReference Include="..\..\..\HIS.SharedKernel.Presentation\HIS.SharedKernel.Presentation.csproj" />
+  </ItemGroup>
+</Project>
