@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!-- Host duy nhất (HIS.Api.dll): ghép 6 module. Chỉ project này được tham chiếu Infrastructure/Presentation của mọi module -->
+  <PropertyGroup>
+    <UserSecretsId>his-api-dev</UserSecretsId>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HIS.SharedKernel.Infrastructure\HIS.SharedKernel.Infrastructure.csproj" />
+    <ProjectReference Include="..\HIS.SharedKernel.Presentation\HIS.SharedKernel.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\NguoiDung\HIS.Modules.NguoiDung.Infrastructure\HIS.Modules.NguoiDung.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\NguoiDung\HIS.Modules.NguoiDung.Presentation\HIS.Modules.NguoiDung.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\DanhMuc\HIS.Modules.DanhMuc.Infrastructure\HIS.Modules.DanhMuc.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\DanhMuc\HIS.Modules.DanhMuc.Presentation\HIS.Modules.DanhMuc.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\LichKham\HIS.Modules.LichKham.Infrastructure\HIS.Modules.LichKham.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\LichKham\HIS.Modules.LichKham.Presentation\HIS.Modules.LichKham.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\HoSoBenhAn\HIS.Modules.HoSoBenhAn.Infrastructure\HIS.Modules.HoSoBenhAn.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\HoSoBenhAn\HIS.Modules.HoSoBenhAn.Presentation\HIS.Modules.HoSoBenhAn.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\VienPhi\HIS.Modules.VienPhi.Infrastructure\HIS.Modules.VienPhi.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\VienPhi\HIS.Modules.VienPhi.Presentation\HIS.Modules.VienPhi.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\TroLyAi\HIS.Modules.TroLyAi.Infrastructure\HIS.Modules.TroLyAi.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\TroLyAi\HIS.Modules.TroLyAi.Presentation\HIS.Modules.TroLyAi.Presentation.csproj" />
+  </ItemGroup>
+</Project>
