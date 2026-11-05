@@ -1,0 +1,13 @@
+# CHỈ dùng ở máy dev (docker compose tự nạp file này). Pipeline KHÔNG copy file này lên EC2.
+services:
+  backend:
+    build: .
+    image: his-backend:dev
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development   # bật Swagger
+  nginx:
+    volumes:
+      - ./nginx/dev:/etc/nginx/conf.d:ro    # chỉ cổng 80, không cần chứng chỉ Origin CA
+  mysql:
+    ports:
+      - "127.0.0.1:3317:3306"               # chạy backend từ IDE: server=localhost;port=3317 (tránh 3306/3307 hay bị chiếm)

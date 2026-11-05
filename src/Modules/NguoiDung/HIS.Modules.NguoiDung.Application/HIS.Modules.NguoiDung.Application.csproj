@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HIS.Modules.NguoiDung.Domain\HIS.Modules.NguoiDung.Domain.csproj" />
+    <ProjectReference Include="..\HIS.Modules.NguoiDung.Contracts\HIS.Modules.NguoiDung.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\HIS.SharedKernel\HIS.SharedKernel.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,75 @@
+# HIS — đúng 3 container: nginx, backend, mysql (4-docker-compose/docker-compose.md).
+# Trên EC2: docker compose pull && docker compose up -d --remove-orphans
+# Máy dev: docker compose up -d --build (tự nạp thêm compose.override.yaml)
+name: his
+
+services:
+  nginx:
+    image: nginx:1.28-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1/nginx-health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks: [his-net]
+
+  backend:
+    image: ghcr.io/nangnguyen235/his-backend:latest
+    env_file: .env
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+      Database__AutoMigrate: "true"
+      # Ghép từ biến MYSQL_* để không phải khai hai lần (mật khẩu chỉ dùng chữ và số)
+      ConnectionStrings__MySql: "server=mysql;port=3306;database=${MYSQL_DATABASE};user=${MYSQL_USER};password=${MYSQL_PASSWORD};AllowPublicKeyRetrieval=true"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks: [his-net]
+
+  mysql:
+    image: mysql:8.0
+    command:
+      - --performance-schema=OFF
+      - --innodb-buffer-pool-size=128M
+      - --max-connections=50
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    networks: [his-net]
+
+volumes:
+  mysql_data:
+
+networks:
+  his-net:

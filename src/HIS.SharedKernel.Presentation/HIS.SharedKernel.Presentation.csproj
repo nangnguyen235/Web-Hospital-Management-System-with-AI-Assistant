@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Phần web dùng chung cho Presentation của các module: ApiControllerBase, CurrentUser -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HIS.SharedKernel\HIS.SharedKernel.csproj" />
+  </ItemGroup>
+</Project>

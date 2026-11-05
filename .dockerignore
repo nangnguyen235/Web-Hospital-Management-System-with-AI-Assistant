@@ -1,0 +1,19 @@
+# Chỉ gửi mã backend vào build context
+**/bin/
+**/obj/
+.git/
+.github/
+.claude/
+.config/
+.vs/
+.vscode/
+bao-cao/
+docs/
+frontend/
+nginx/
+scripts/
+tests/
+*.md
+.env
+.env.*
+compose*.yaml

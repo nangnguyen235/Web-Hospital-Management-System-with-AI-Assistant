@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Chỉ abstraction, KHÔNG phụ thuộc gói ngoài (Domain tham chiếu project này) -->
+  <ItemGroup>
+    <PackageReference Include="MediatR.Contracts" />
+  </ItemGroup>
+</Project>
