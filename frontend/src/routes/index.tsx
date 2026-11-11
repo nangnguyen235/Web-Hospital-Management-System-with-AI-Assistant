@@ -1,45 +1,76 @@
 import type { RouteObject } from 'react-router-dom'
-import PlaceholderPage from '../components/General/PlaceholderPage'
 import AdminLayout from '../layouts/AdminLayout'
 import LogoLayout from '../layouts/LogoLayout'
 import MainLayout from '../layouts/MainLayout'
 import ProtectedLayout from '../layouts/ProtectedLayout'
 import StaffLayout from '../layouts/StaffLayout'
 import UserLayout from '../layouts/UserLayout'
+import BenhNhanAdminPage from '../pages/admin/BenhNhanPage'
+import DichVuPage from '../pages/admin/DichVuPage'
+import GiaoDichPage from '../pages/admin/GiaoDichPage'
 import KhoaPage from '../pages/admin/KhoaPage'
+import LichKhamAdminPage from '../pages/admin/LichKhamAdminPage'
+import NhanVienPage from '../pages/admin/NhanVienPage'
+import PhongPage from '../pages/admin/PhongPage'
+import TaiKhoanPage from '../pages/admin/TaiKhoanPage'
+import ThongKePage from '../pages/admin/ThongKePage'
+import ThuocPage from '../pages/admin/ThuocPage'
+import DangKyPage from '../pages/auth/DangKyPage'
 import DangNhapPage from '../pages/auth/DangNhapPage'
+import QuenMatKhauPage from '../pages/auth/QuenMatKhauPage'
+import BenhNhanPage from '../pages/bac-si/BenhNhanPage'
+import KhamBenhPage from '../pages/bac-si/KhamBenhPage'
+import LichTrucBacSiPage from '../pages/bac-si/LichTrucBacSiPage'
+import QuanLyLichPage from '../pages/bac-si/QuanLyLichPage'
+import ChonBacSiPage from '../pages/benh-nhan/ChonBacSiPage'
+import ChonHoSoPage from '../pages/benh-nhan/ChonHoSoPage'
+import ChonNgayPage from '../pages/benh-nhan/ChonNgayPage'
+import HoSoPage from '../pages/benh-nhan/HoSoPage'
+import LichSuKhamPage from '../pages/benh-nhan/LichSuKhamPage'
+import NhacThuocPage from '../pages/benh-nhan/NhacThuocPage'
+import PhieuKhamPage from '../pages/benh-nhan/PhieuKhamPage'
+import ThongBaoPage from '../pages/benh-nhan/ThongBaoPage'
+import TimLaiHoSoPage from '../pages/benh-nhan/TimLaiHoSoPage'
+import XacNhanPage from '../pages/benh-nhan/XacNhanPage'
+import XetNghiemPage from '../pages/benh-nhan/XetNghiemPage'
+import KetQuaThanhToanPage from '../pages/cong-khai/KetQuaThanhToanPage'
 import ManHinhSoPage from '../pages/cong-khai/ManHinhSoPage'
 import NotFoundPage from '../pages/cong-khai/NotFoundPage'
+import TimBacSiPage from '../pages/cong-khai/TimBacSiPage'
 import TrangChuPage from '../pages/cong-khai/TrangChuPage'
+import LichTrucDieuDuongPage from '../pages/dieu-duong/LichTrucDieuDuongPage'
+import PhanCongPage from '../pages/dieu-duong/PhanCongPage'
+import PhongXetNghiemPage from '../pages/dieu-duong/PhongXetNghiemPage'
+import QuayPage from '../pages/dieu-duong/QuayPage'
+import SoThuTuPage from '../pages/dieu-duong/SoThuTuPage'
+import TiepNhanPage from '../pages/dieu-duong/TiepNhanPage'
 
-const cho = (tieuDe: string, ...fr: string[]) => <PlaceholderPage tieuDe={tieuDe} fr={fr} />
-
-/** Bảng route ↔ FR: frontend.md mục 5. Trang chưa nối API dùng PlaceholderPage. */
+/** Bảng route ↔ FR: frontend.md mục 5. AI 1 (chatbot, FR-BN-17) và AI 2 (FR-BS-06) làm ở giai đoạn AI. */
 export const routes: RouteObject[] = [
   {
     element: <MainLayout />,
     children: [
       { path: '/', element: <TrangChuPage /> },
-      { path: '/tim-bac-si', element: cho('Tìm bác sĩ', 'FR-BN-07') },
-      { path: '/thanh-toan/ket-qua', element: cho('Kết quả thanh toán VNPAY', 'FR-HT-02') },
+      { path: '/tim-bac-si', element: <TimBacSiPage /> },
+      { path: '/thanh-toan/ket-qua', element: <KetQuaThanhToanPage /> },
       {
         element: <ProtectedLayout vaiTro={['BENH_NHAN']} />,
         children: [
-          { path: '/dat-kham/chon-ho-so', element: cho('Đặt khám · Chọn hồ sơ', 'FR-BN-08') },
-          { path: '/dat-kham/chon-bac-si', element: cho('Đặt khám · Chọn bác sĩ', 'FR-BN-08') },
-          { path: '/dat-kham/chon-ngay', element: cho('Đặt khám · Chọn ngày và khung giờ', 'FR-BN-08') },
-          { path: '/dat-kham/xac-nhan', element: cho('Đặt khám · Xác nhận và thanh toán', 'FR-BN-08') },
-          { path: '/tim-lai-ho-so', element: cho('Tìm lại hồ sơ đã mất', 'FR-BN-06') },
+          { path: '/dat-kham/chon-ho-so', element: <ChonHoSoPage /> },
+          { path: '/dat-kham/chon-bac-si', element: <ChonBacSiPage /> },
+          { path: '/dat-kham/chon-ngay', element: <ChonNgayPage /> },
+          { path: '/dat-kham/xac-nhan', element: <XacNhanPage /> },
+          { path: '/tim-lai-ho-so', element: <TimLaiHoSoPage /> },
           {
             path: '/tai-khoan',
             element: <UserLayout />,
             children: [
-              { path: 'ho-so', element: cho('Hồ sơ bệnh nhân', 'FR-BN-05') },
-              { path: 'phieu-kham', element: cho('Phiếu khám bệnh', 'FR-BN-09', 'FR-BN-10') },
-              { path: 'lich-su-kham', element: cho('Lịch sử khám bệnh', 'FR-BN-11', 'FR-BN-14') },
-              { path: 'xet-nghiem', element: cho('Kết quả xét nghiệm', 'FR-BN-12', 'FR-BN-13') },
-              { path: 'nhac-thuoc', element: cho('Nhắc uống thuốc', 'FR-BN-15') },
-              { path: 'thong-bao', element: cho('Thông báo', 'FR-BN-16') },
+              { path: 'ho-so', element: <HoSoPage /> },
+              { path: 'phieu-kham', element: <PhieuKhamPage /> },
+              { path: 'lich-su-kham', element: <LichSuKhamPage /> },
+              { path: 'xet-nghiem', element: <XetNghiemPage /> },
+              { path: 'nhac-thuoc', element: <NhacThuocPage /> },
+              { path: 'thong-bao', element: <ThongBaoPage /> },
             ],
           },
         ],
@@ -50,8 +81,8 @@ export const routes: RouteObject[] = [
     element: <LogoLayout />,
     children: [
       { path: '/dang-nhap', element: <DangNhapPage /> },
-      { path: '/dang-ky', element: cho('Đăng ký tài khoản', 'FR-BN-01') },
-      { path: '/quen-mat-khau', element: cho('Quên mật khẩu', 'FR-BN-04') },
+      { path: '/dang-ky', element: <DangKyPage /> },
+      { path: '/quen-mat-khau', element: <QuenMatKhauPage /> },
     ],
   },
   { path: '/man-hinh-so/:lichKhamId', element: <ManHinhSoPage /> },
@@ -62,12 +93,12 @@ export const routes: RouteObject[] = [
         path: '/bac-si',
         element: <StaffLayout />,
         children: [
-          { path: 'benh-nhan', element: cho('Bệnh nhân của lịch khám', 'FR-BS-02', 'FR-BS-03') },
-          { path: 'benh-an/:id', element: cho('Khám bệnh', 'FR-BS-04', 'FR-BS-05', 'FR-BS-06', 'FR-BS-07', 'FR-BS-08', 'FR-BS-09', 'FR-BS-10') },
-          { path: 'lich-truc', element: cho('Lịch trực', 'FR-BS-02') },
+          { path: 'benh-nhan', element: <BenhNhanPage /> },
+          { path: 'benh-an/:id', element: <KhamBenhPage /> },
+          { path: 'lich-truc', element: <LichTrucBacSiPage /> },
           {
             element: <ProtectedLayout vaiTro={['BAC_SI']} canTruongKhoa />,
-            children: [{ path: 'quan-ly-lich', element: cho('Quản lý lịch khám của khoa', 'FR-BS-11', 'FR-BS-12', 'FR-BS-13', 'FR-BS-14') }],
+            children: [{ path: 'quan-ly-lich', element: <QuanLyLichPage /> }],
           },
         ],
       },
@@ -80,14 +111,14 @@ export const routes: RouteObject[] = [
         path: '/dieu-duong',
         element: <StaffLayout />,
         children: [
-          { path: 'tiep-nhan', element: cho('Tiếp nhận bệnh nhân', 'FR-DD-03', 'FR-DD-04', 'FR-DD-05', 'FR-DD-06') },
-          { path: 'so-thu-tu', element: cho('Số thứ tự', 'FR-DD-07') },
-          { path: 'quay', element: cho('Quầy dịch vụ — khách vãng lai', 'FR-DD-08') },
-          { path: 'xet-nghiem', element: cho('Phòng xét nghiệm', 'FR-DD-09', 'FR-DD-10', 'FR-DD-11') },
-          { path: 'lich-truc', element: cho('Lịch trực', 'FR-DD-02') },
+          { path: 'tiep-nhan', element: <TiepNhanPage /> },
+          { path: 'so-thu-tu', element: <SoThuTuPage /> },
+          { path: 'quay', element: <QuayPage /> },
+          { path: 'xet-nghiem', element: <PhongXetNghiemPage /> },
+          { path: 'lich-truc', element: <LichTrucDieuDuongPage /> },
           {
             element: <ProtectedLayout vaiTro={['DIEU_DUONG']} canTruongKhoa />,
-            children: [{ path: 'phan-cong', element: cho('Phân công điều dưỡng', 'FR-DD-12') }],
+            children: [{ path: 'phan-cong', element: <PhanCongPage /> }],
           },
         ],
       },
@@ -100,16 +131,16 @@ export const routes: RouteObject[] = [
         path: '/admin',
         element: <AdminLayout />,
         children: [
-          { path: 'thong-ke', element: cho('Thống kê', 'FR-AD-01') },
-          { path: 'tai-khoan', element: cho('Quản lý tài khoản', 'FR-AD-02') },
-          { path: 'nhan-vien', element: cho('Quản lý nhân viên', 'FR-AD-03') },
+          { path: 'thong-ke', element: <ThongKePage /> },
+          { path: 'tai-khoan', element: <TaiKhoanPage /> },
+          { path: 'nhan-vien', element: <NhanVienPage /> },
           { path: 'khoa', element: <KhoaPage /> },
-          { path: 'phong', element: cho('Quản lý phòng', 'FR-AD-05') },
-          { path: 'dich-vu', element: cho('Quản lý dịch vụ', 'FR-AD-06') },
-          { path: 'thuoc', element: cho('Quản lý thuốc', 'FR-AD-07') },
-          { path: 'benh-nhan', element: cho('Quản lý bệnh nhân', 'FR-AD-08') },
-          { path: 'giao-dich', element: cho('Giao dịch', 'FR-AD-09') },
-          { path: 'lich-kham', element: cho('Lịch khám', 'FR-AD-10') },
+          { path: 'phong', element: <PhongPage /> },
+          { path: 'dich-vu', element: <DichVuPage /> },
+          { path: 'thuoc', element: <ThuocPage /> },
+          { path: 'benh-nhan', element: <BenhNhanAdminPage /> },
+          { path: 'giao-dich', element: <GiaoDichPage /> },
+          { path: 'lich-kham', element: <LichKhamAdminPage /> },
         ],
       },
     ],

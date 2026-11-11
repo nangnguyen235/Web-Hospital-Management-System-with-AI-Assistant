@@ -16,6 +16,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { TEN_VAI_TRO } from '../auth/jwt'
 import { useAuth } from '../auth/useAuth'
 import Logo from '../components/General/Logo'
+import { BRAND } from '../config/brand'
 import { MENU_BAC_SI, MENU_DIEU_DUONG } from '../routes/menu'
 
 const RONG = 280
@@ -95,9 +96,9 @@ export default function StaffLayout() {
             <MenuRoundedIcon />
           </IconButton>
           <MeetingRoomRoundedIcon color="primary" />
-          {/* Phòng – Khoa lấy từ lịch phân công/lịch khám hôm nay khi module LichKham có API (FR-BS-02, FR-DD-02) */}
+          {/* Phòng làm việc chọn trong từng trang (BR-08: không chặn theo phân công) */}
           <Typography variant="h6" sx={{ fontWeight: 500 }}>
-            Chưa chọn phòng làm việc
+            {BRAND.tenDayDu} · {new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}
           </Typography>
         </Box>
         <Box sx={{ px: { xs: 2, md: 5 }, py: 4 }}>

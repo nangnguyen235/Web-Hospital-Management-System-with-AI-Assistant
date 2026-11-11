@@ -1,10 +1,11 @@
-# Deploy khi push main: test → build 1 image backend → GHCR → SSH vào EC2 → compose pull/up.
-# Secret cần có: EC2_HOST (IP hiện tại), EC2_USER, EC2_SSH_KEY. Đăng nhập GHCR bằng GITHUB_TOKEN.
+# Deploy CHỈ từ nhánh baseline (bản triển khai chính thức): test → image backend → GHCR → SSH EC2 → compose pull/up;
+# frontend build → Cloudflare Pages (Direct Upload). Nhánh main chỉ chạy CI, không ảnh hưởng VPS.
+# Secret: EC2_HOST (IP hiện tại), EC2_USER, EC2_SSH_KEY, CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID. GHCR dùng GITHUB_TOKEN.
 name: Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [baseline]
   workflow_dispatch:
 
 concurrency:
@@ -22,14 +23,43 @@ jobs:
   test:
     name: Test lại trước khi deploy
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-dotnet@v6
+      - uses: actions/setup-java@v6
         with:
-          global-json-file: global.json
-      - run: dotnet restore HIS.ModularMonolith.sln
-      - run: dotnet build HIS.ModularMonolith.sln -c Release --no-restore
-      - run: dotnet test HIS.ModularMonolith.sln -c Release --no-build
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: chmod +x mvnw && ./mvnw -B verify
+
+  frontend:
+    name: Frontend → Cloudflare Pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Lint, test, build
+        working-directory: frontend
+        env:
+          VITE_API_URL: https://api.nangnguyen.me
+        run: |
+          npm ci
+          npm run lint
+          npm run test
+          npm run build
+      - name: Đẩy dist lên Pages (project thehos, nhánh production)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy frontend/dist --project-name=thehos --branch=main --commit-dirty=true
 
   image:
     name: Build và push image lên GHCR
@@ -45,7 +75,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v7
         with:
-          context: .
+          context: ./backend
           push: true
           tags: |
             ${{ env.IMAGE }}:latest
@@ -83,12 +113,17 @@ jobs:
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             docker compose pull
             docker compose up -d --remove-orphans
+            docker compose restart nginx   # nạp lại nginx/conf.d vừa copy (image nginx không đổi thì up không tạo lại)
             docker logout ghcr.io
             docker image prune -f
+            # JVM khởi động + Flyway: chờ tối đa 3 phút
             for i in $(seq 1 36); do
-              STATUS=$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q backend)")
+              CID=$(docker compose ps -q backend || true)
+              STATUS=$( [ -n "$CID" ] && docker inspect -f '{{.State.Health.Status}}' "$CID" || echo "khong-co-container")
               if [ "$STATUS" = "healthy" ]; then echo "backend healthy"; exit 0; fi
               sleep 5
             done
-            docker compose logs --tail 100 backend
+            echo "backend chưa healthy (trạng thái: $STATUS)"
+            docker compose ps
+            docker compose logs --tail 150 backend
             exit 1

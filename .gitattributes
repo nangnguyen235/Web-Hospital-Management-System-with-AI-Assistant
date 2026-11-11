@@ -1,0 +1,4 @@
+# Script chạy trên Linux (Docker, EC2, GitHub Actions) PHẢI giữ LF dù clone trên Windows.
+*.sh       text eol=lf
+mvnw       text eol=lf
+*.cmd      text eol=crlf

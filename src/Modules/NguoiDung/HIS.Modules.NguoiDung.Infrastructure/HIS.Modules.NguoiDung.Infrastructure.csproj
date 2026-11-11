@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <PackageReference Include="BCrypt.Net-Next" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HIS.Modules.NguoiDung.Application\HIS.Modules.NguoiDung.Application.csproj" />
-    <ProjectReference Include="..\..\..\HIS.SharedKernel.Infrastructure\HIS.SharedKernel.Infrastructure.csproj" />
-  </ItemGroup>
-</Project>

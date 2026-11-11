@@ -18,13 +18,14 @@ Nghiệp vụ và thiết kế CSDL tham khảo [TheDuckHospital](https://github
 ## Cấu trúc
 
 ```text
-src/HIS.Api                       Host: Program.cs, xác thực JWT, xử lý lỗi tập trung, Swagger
-src/HIS.SharedKernel*             Dùng chung: abstraction / cài đặt hạ tầng / web
-src/Modules/<Module>/             NguoiDung, DanhMuc, LichKham, HoSoBenhAn, VienPhi, TroLyAi
-  HIS.Modules.<Module>.Domain | .Application | .Infrastructure | .Presentation | .Contracts
-tests/                            Architecture test (NetArchTest) + unit test
+backend/                          Toàn bộ backend .NET: HIS.ModularMonolith.sln, global.json, Dockerfile
+  src/HIS.Api                     Host: Program.cs, xác thực JWT, xử lý lỗi tập trung, Swagger
+  src/HIS.SharedKernel*           Dùng chung: abstraction / cài đặt hạ tầng / web
+  src/Modules/<Module>/           NguoiDung, DanhMuc, LichKham, HoSoBenhAn, VienPhi, TroLyAi
+    HIS.Modules.<Module>.Domain | .Application | .Infrastructure | .Presentation | .Contracts
+  tests/                          Architecture test (NetArchTest) + unit test
 frontend/                         Giao diện web TheHos
-nginx/  compose.yaml  Dockerfile  scripts/  .github/workflows/
+nginx/  compose.yaml  scripts/  docs/  .github/workflows/
 ```
 
 ## Chạy nhanh
@@ -33,8 +34,10 @@ nginx/  compose.yaml  Dockerfile  scripts/  .github/workflows/
 cp .env.example .env               # sửa mật khẩu, Jwt__Key, Seed__* (không commit .env)
 docker compose up -d --build       # http://localhost/health, http://localhost/swagger
 cd frontend && npm ci && npm run dev   # http://localhost:5173
-dotnet test                        # gồm architecture test chặn tham chiếu chéo module
+cd backend && dotnet test         # gồm architecture test chặn tham chiếu chéo module
 ```
+
+Đã chạy trước đó (giữ `.env` và dữ liệu cũ): `git pull` → `docker compose up -d --build` → `cd frontend && npm run dev`. Chi tiết ở Phần A2 của [docs/trien-khai.md](docs/trien-khai.md).
 
 Triển khai lên Cloudflare + EC2: xem [docs/trien-khai.md](docs/trien-khai.md).
 

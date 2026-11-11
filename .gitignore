@@ -16,7 +16,12 @@ nginx/certs/
 *.pem
 *.key
 
-# .NET
+# Java / Maven (backend)
+target/
+*.iml
+.idea/
+
+# .NET (bản cũ, tag dotnet-cuoi)
 bin/
 obj/
 *.user

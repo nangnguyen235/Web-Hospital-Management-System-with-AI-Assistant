@@ -22,17 +22,40 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    mem_limit: 64m
     restart: unless-stopped
     networks: [his-net]
 
   backend:
     image: ghcr.io/nangnguyen235/his-backend:latest
-    env_file: .env
+    # Biến lấy từ .env (Compose tự đọc .env cùng thư mục) — khai tường minh để thấy đủ cấu hình (docker-compose.md mục 4).
     environment:
       TZ: Asia/Ho_Chi_Minh
-      Database__AutoMigrate: "true"
-      # Ghép từ biến MYSQL_* để không phải khai hai lần (mật khẩu chỉ dùng chữ và số)
-      ConnectionStrings__MySql: "server=mysql;port=3306;database=${MYSQL_DATABASE};user=${MYSQL_USER};password=${MYSQL_PASSWORD};AllowPublicKeyRetrieval=true"
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60 -XX:+UseSerialGC -XX:+ExitOnOutOfMemoryError"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?allowPublicKeyRetrieval=true&useSSL=false"
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      HIS_JWT_KEY: ${HIS_JWT_KEY:?Thiếu HIS_JWT_KEY trong .env}
+      HIS_JWT_ISSUER: ${HIS_JWT_ISSUER:-his-api}
+      HIS_JWT_AUDIENCE: ${HIS_JWT_AUDIENCE:-his-frontend}
+      HIS_SEED_ADMIN_EMAIL: ${HIS_SEED_ADMIN_EMAIL:-}
+      HIS_SEED_ADMIN_SO_DIEN_THOAI: ${HIS_SEED_ADMIN_SO_DIEN_THOAI:-}
+      HIS_SEED_ADMIN_MAT_KHAU: ${HIS_SEED_ADMIN_MAT_KHAU:-}
+      HIS_CORS_ALLOWED_ORIGINS: ${HIS_CORS_ALLOWED_ORIGINS:-https://nangnguyen.me}
+      HIS_SWAGGER_ENABLED: ${HIS_SWAGGER_ENABLED:-false}
+      HIS_FRONTEND_URL: ${HIS_FRONTEND_URL:-https://nangnguyen.me}
+      HIS_R2_ENDPOINT: ${HIS_R2_ENDPOINT:-}
+      HIS_R2_ACCESS_KEY: ${HIS_R2_ACCESS_KEY:-}
+      HIS_R2_SECRET_KEY: ${HIS_R2_SECRET_KEY:-}
+      HIS_R2_BUCKET: ${HIS_R2_BUCKET:-}
+      HIS_VNPAY_TMN_CODE: ${HIS_VNPAY_TMN_CODE:-}
+      HIS_VNPAY_HASH_SECRET: ${HIS_VNPAY_HASH_SECRET:-}
+      HIS_VNPAY_PAY_URL: ${HIS_VNPAY_PAY_URL:-https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
+      HIS_VNPAY_RETURN_URL: ${HIS_VNPAY_RETURN_URL:-https://nangnguyen.me/thanh-toan/ket-qua}
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-587}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
     depends_on:
       mysql:
         condition: service_healthy
@@ -41,7 +64,8 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 60s
+      start_period: 90s      # JVM khởi động chậm hơn .NET
+    mem_limit: 1g
     restart: unless-stopped
     networks: [his-net]
 
@@ -49,8 +73,11 @@ services:
     image: mysql:8.0
     command:
       - --performance-schema=OFF
-      - --innodb-buffer-pool-size=128M
+      - --innodb-buffer-pool-size=256M
       - --max-connections=50
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    mem_limit: 512m
     environment:
       TZ: Asia/Ho_Chi_Minh
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}

@@ -1,0 +1,95 @@
+# Cấu hình HIS — chỉ giá trị không bí mật và ${BIEN:mac-dinh}; bí mật lấy từ biến môi trường / .env
+# (4-docker-compose/docker-compose.md mục 4). KHÔNG hardcode bí mật ở đây.
+spring:
+  application:
+    name: his
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3317/his?allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${SPRING_DATASOURCE_USERNAME:his}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    hikari:
+      maximum-pool-size: 10
+      # READ COMMITTED: sau khi chờ khóa dòng khung giờ, câu đếm chỗ thấy phiếu người khác vừa commit (BR-10).
+      # REPEATABLE READ (mặc định MySQL) đọc ảnh chụp cũ → hai người cùng lấy được chỗ cuối.
+      transaction-isolation: TRANSACTION_READ_COMMITTED
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    locations: classpath:db/migration
+  jackson:
+    deserialization:
+      # Jackson 3 mặc định báo lỗi khi JSON thiếu trường kiểu nguyên thủy (boolean, int) — giữ cách cũ: thiếu = false/0
+      fail-on-null-for-primitives: false
+  mail:
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.connectiontimeout: 10000
+      mail.smtp.timeout: 10000
+      mail.smtp.writetimeout: 10000
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
+  modulith:
+    events:
+      republish-outstanding-events-on-restart: true
+      jdbc:
+        schema-initialization:
+          enabled: false
+
+server:
+  port: 8080
+  forward-headers-strategy: framework
+  tomcat:
+    threads:
+      max: 50
+
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health
+      path-mapping:
+        health: health
+  endpoint:
+    health:
+      show-details: never
+  health:
+    mail:
+      enabled: false
+
+springdoc:
+  api-docs:
+    enabled: ${HIS_SWAGGER_ENABLED:false}
+  swagger-ui:
+    enabled: ${HIS_SWAGGER_ENABLED:false}
+
+his:
+  jwt:
+    key: ${HIS_JWT_KEY:}
+    issuer: ${HIS_JWT_ISSUER:his-api}
+    audience: ${HIS_JWT_AUDIENCE:his-frontend}
+    so-phut-het-han: 60
+  r2:
+    endpoint: ${HIS_R2_ENDPOINT:}
+    access-key: ${HIS_R2_ACCESS_KEY:}
+    secret-key: ${HIS_R2_SECRET_KEY:}
+    bucket: ${HIS_R2_BUCKET:}
+  cors:
+    allowed-origins: ${HIS_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  frontend-url: ${HIS_FRONTEND_URL:http://localhost:5173}
+  vnpay:
+    tmn-code: ${HIS_VNPAY_TMN_CODE:}
+    hash-secret: ${HIS_VNPAY_HASH_SECRET:}
+    pay-url: ${HIS_VNPAY_PAY_URL:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
+    return-url: ${HIS_VNPAY_RETURN_URL:http://localhost:5173/thanh-toan/ket-qua}
+  seed:
+    admin:
+      email: ${HIS_SEED_ADMIN_EMAIL:}
+      so-dien-thoai: ${HIS_SEED_ADMIN_SO_DIEN_THOAI:}
+      mat-khau: ${HIS_SEED_ADMIN_MAT_KHAU:}
+      ho-ten: ${HIS_SEED_ADMIN_HO_TEN:Quản trị viên}

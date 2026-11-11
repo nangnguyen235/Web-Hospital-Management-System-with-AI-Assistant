@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  HIS (TheHos) — backend Modular Monolith: Spring Boot + Spring Modulith, Maven đa module.
+  Cấu trúc và ma trận phụ thuộc: .claude/rules/2-kien-truc-modular-monolith/modular-monolith.md mục 1, 2.1.
+  MỌI phiên bản khai ở file này (parent, BOM, <properties>).
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.2</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>vn.nhom6.his</groupId>
+    <artifactId>his-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    <name>HIS - TheHos Hospital</name>
+
+    <properties>
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-modulith.version>2.1.2</spring-modulith.version>
+        <aws-sdk.version>2.57.13</aws-sdk.version>
+        <springdoc.version>3.2.0</springdoc.version>
+        <archunit.version>1.5.1</archunit.version>
+    </properties>
+
+    <modules>
+        <module>shared/his-shared-kernel</module>
+        <module>shared/his-shared-infra</module>
+        <module>shared/his-shared-web</module>
+        <module>modules/danh-muc/his-danh-muc-contracts</module>
+        <module>modules/danh-muc/his-danh-muc</module>
+        <module>modules/nguoi-dung/his-nguoi-dung-contracts</module>
+        <module>modules/nguoi-dung/his-nguoi-dung</module>
+        <module>modules/lich-kham/his-lich-kham-contracts</module>
+        <module>modules/lich-kham/his-lich-kham</module>
+        <module>modules/ho-so-benh-an/his-ho-so-benh-an-contracts</module>
+        <module>modules/ho-so-benh-an/his-ho-so-benh-an</module>
+        <module>modules/vien-phi/his-vien-phi-contracts</module>
+        <module>modules/vien-phi/his-vien-phi</module>
+        <module>modules/tro-ly-ai/his-tro-ly-ai-contracts</module>
+        <module>modules/tro-ly-ai/his-tro-ly-ai</module>
+        <module>his-app</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.modulith</groupId>
+                <artifactId>spring-modulith-bom</artifactId>
+                <version>${spring-modulith.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws-sdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.tngtech.archunit</groupId>
+                <artifactId>archunit-junit5</artifactId>
+                <version>${archunit.version}</version>
+            </dependency>
+
+            <!-- Artifact nội bộ -->
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-shared-kernel</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-shared-infra</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-shared-web</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-danh-muc-contracts</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-danh-muc</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-nguoi-dung-contracts</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-nguoi-dung</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-lich-kham-contracts</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-lich-kham</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-ho-so-benh-an-contracts</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-ho-so-benh-an</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-vien-phi-contracts</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-vien-phi</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-tro-ly-ai-contracts</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>vn.nhom6.his</groupId><artifactId>his-tro-ly-ai</artifactId><version>${project.version}</version></dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <release>${java.version}</release>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

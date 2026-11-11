@@ -18,8 +18,15 @@ TEN="his-$(date +%Y%m%d).sql.gz"
 
 echo "[$(date '+%F %T')] Bắt đầu sao lưu $DB"
 docker compose exec -T -e MYSQL_PWD="$(doc_env MYSQL_ROOT_PASSWORD)" mysql \
-  mysqldump -uroot --single-transaction --routines --databases "$DB" \
+  mysqldump -uroot --single-transaction --routines --events --databases "$DB" \
   | gzip > "$THU_MUC_SAO_LUU/$TEN"
+
+# Bản sao lưu hỏng/rỗng thì dừng, không đẩy lên R2 và không xóa bản cũ
+if ! gzip -t "$THU_MUC_SAO_LUU/$TEN" || [ "$(zcat "$THU_MUC_SAO_LUU/$TEN" | head -c 100000 | grep -c 'CREATE TABLE')" -lt 10 ]; then
+  echo "[$(date '+%F %T')] LỖI: file sao lưu hỏng hoặc thiếu bảng — giữ nguyên các bản cũ"
+  rm -f "$THU_MUC_SAO_LUU/$TEN"
+  exit 1
+fi
 
 rclone copy "$THU_MUC_SAO_LUU/$TEN" "$REMOTE/"
 
