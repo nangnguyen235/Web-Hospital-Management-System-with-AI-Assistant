@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Sao lưu MySQL hằng đêm lên bucket R2 sao lưu, giữ 7 bản — 4-docker-compose/docker-compose.md mục 6.
-# Cron (crontab -e của user his — setup-vps.sh đã cài sẵn):
+# Cron (crontab -e của user ubuntu):
 #   0 2 * * * bash /opt/his/scripts/backup-mysql.sh >> /var/backups/his/backup.log 2>&1
 # Mật khẩu đọc từ /opt/his/.env (chmod 600), KHÔNG ghi trong crontab.
 # rclone remote "r2-sao-luu" cấu hình bằng token riêng chỉ có quyền bucket sao lưu (docs/trien-khai.md).

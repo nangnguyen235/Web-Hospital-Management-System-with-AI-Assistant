@@ -1,4 +1,4 @@
-# CHỈ dùng ở máy dev (docker compose tự nạp file này). Pipeline KHÔNG copy file này lên VPS.
+# CHỈ dùng ở máy dev (docker compose tự nạp file này). Pipeline KHÔNG copy file này lên EC2.
 services:
   backend:
     build: ./backend

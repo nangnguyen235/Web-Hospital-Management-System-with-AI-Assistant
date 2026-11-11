@@ -1,6 +1,6 @@
-# Deploy CHỈ từ nhánh baseline (bản triển khai chính thức): test → image backend → GHCR → SSH VPS (DigitalOcean) → compose pull/up;
+# Deploy CHỈ từ nhánh baseline (bản triển khai chính thức): test → image backend → GHCR → SSH EC2 → compose pull/up;
 # frontend build → Cloudflare Pages (Direct Upload). Nhánh main chỉ chạy CI, không ảnh hưởng VPS.
-# Secret: VPS_HOST (IP Droplet), VPS_USER (his), VPS_SSH_KEY (khóa deploy), CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID. GHCR dùng GITHUB_TOKEN.
+# Secret: EC2_HOST (IP hiện tại), EC2_USER, EC2_SSH_KEY, CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID. GHCR dùng GITHUB_TOKEN.
 name: Deploy
 
 on:
@@ -84,7 +84,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy:
-    name: Deploy lên VPS
+    name: Deploy lên EC2
     needs: image
     runs-on: ubuntu-latest
     steps:
@@ -92,9 +92,9 @@ jobs:
       - name: Copy compose.yaml và cấu hình NGINX lên /opt/his
         uses: appleboy/scp-action@v1.0.0
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           source: "compose.yaml,nginx/conf.d,scripts/backup-mysql.sh"
           target: /opt/his
       - name: Kéo image mới và khởi động lại
@@ -103,9 +103,9 @@ jobs:
           GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           envs: GHCR_USER,GHCR_TOKEN
           script: |
             set -e

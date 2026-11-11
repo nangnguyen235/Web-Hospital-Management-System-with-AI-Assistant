@@ -14,11 +14,7 @@ import org.springframework.stereotype.Service;
 import vn.nhom6.his.shared.kernel.IEmailService;
 import vn.nhom6.his.shared.kernel.Loi;
 
-/**
- * Gửi email qua SMTP (spring.mail.*): production dùng Brevo cổng 2525 vì DigitalOcean chặn 25/465/587; máy dev dùng được Gmail.
- * Địa chỉ gửi = his.email.nguoi-gui (địa chỉ đã xác minh ở Brevo); để trống thì dùng spring.mail.username (Gmail).
- * KHÔNG log nội dung thư vì có OTP (rule 3).
- */
+/** Gửi email qua Gmail SMTP (App Password, spring.mail.*). KHÔNG log nội dung thư vì có OTP (rule 3). */
 @Service
 public class SmtpEmailService implements IEmailService {
 
@@ -27,9 +23,7 @@ public class SmtpEmailService implements IEmailService {
     private final ObjectProvider<JavaMailSender> mailSender;
     private final String nguoiGui;
 
-    public SmtpEmailService(
-            ObjectProvider<JavaMailSender> mailSender,
-            @Value("${his.email.nguoi-gui:${spring.mail.username:}}") String nguoiGui) {
+    public SmtpEmailService(ObjectProvider<JavaMailSender> mailSender, @Value("${spring.mail.username:}") String nguoiGui) {
         this.mailSender = mailSender;
         this.nguoiGui = nguoiGui;
     }

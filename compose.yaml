@@ -1,5 +1,5 @@
 # HIS — đúng 3 container: nginx, backend, mysql (4-docker-compose/docker-compose.md).
-# Trên VPS (DigitalOcean Droplet): docker compose pull && docker compose up -d --remove-orphans
+# Trên EC2: docker compose pull && docker compose up -d --remove-orphans
 # Máy dev: docker compose up -d --build (tự nạp thêm compose.override.yaml)
 name: his
 
@@ -53,10 +53,9 @@ services:
       HIS_VNPAY_PAY_URL: ${HIS_VNPAY_PAY_URL:-https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
       HIS_VNPAY_RETURN_URL: ${HIS_VNPAY_RETURN_URL:-https://nangnguyen.me/thanh-toan/ket-qua}
       SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-}
-      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-2525}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-587}
       SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
       SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
-      HIS_EMAIL_NGUOI_GUI: ${HIS_EMAIL_NGUOI_GUI:-}
     depends_on:
       mysql:
         condition: service_healthy
