@@ -488,7 +488,7 @@ cd /opt/his && bash scripts/khoi-phuc-mysql.sh his-<ngày>.sql.gz his_thu   # in
 | `baseline` | Bản hoàn chỉnh nhóm trưởng dựng — bản demo, bản đang chạy trên `nangnguyen.me` | Có (mọi PR vào `baseline`) | **Có** — mỗi lần `baseline` đổi |
 | `main` | Các thành viên đưa lại code theo nhiệm vụ của mình (skill `day-ma`, `nhiemvuthanhvien.md`) | Có (mọi PR vào `main` và mỗi lần `main` đổi) | **Không** — `main` thay đổi không ảnh hưởng `baseline` và VPS |
 
-Cả hai nhánh được bảo vệ bằng ruleset (`scripts/bao-ve-nhanh.sh`): chặn xóa, chặn force-push, phải qua Pull Request có **1 approval** và CI xanh; chỉ Admin repo (nhóm trưởng) được bypass.
+Cả hai nhánh được bảo vệ bằng ruleset (`scripts/bao-ve-nhanh.sh`): chặn xóa, chặn force-push, phải qua Pull Request có **1 approval**; riêng `baseline` còn bắt buộc CI xanh (`main` vẫn chạy CI nhưng không bắt buộc, vì khi mới lắp một phần task thì build chưa đủ module). Chỉ Admin repo (nhóm trưởng) được bypass.
 
 **Thành viên làm hằng ngày**:
 1. 💻 `git switch main && git pull`, rồi tạo nhánh riêng: `git switch -c feature/<ten>-<viec>`.
