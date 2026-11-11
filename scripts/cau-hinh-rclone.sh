@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Tạo remote rclone "r2-sao-luu" cho bucket R2 sao lưu (token RIÊNG, chỉ có quyền bucket thehos-sao-luu).
-# Khóa sao lưu KHÔNG nằm trong .env của ứng dụng (docker-compose.md mục 4). Chạy trên EC2 bằng user ubuntu:
+# Khóa sao lưu KHÔNG nằm trong .env của ứng dụng (docker-compose.md mục 4). Chạy trên VPS bằng user his:
 #   R2_ACCOUNT_ID=... R2_SAO_LUU_ACCESS_KEY=... R2_SAO_LUU_SECRET_KEY=... bash scripts/cau-hinh-rclone.sh
 set -euo pipefail
 

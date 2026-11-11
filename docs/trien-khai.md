@@ -11,7 +11,7 @@ Ký hiệu nơi làm:
 | Ký hiệu | Là gì | Mở thế nào |
 | --- | --- | --- |
 | 💻 **Terminal** | Cửa sổ gõ lệnh trên máy mình. Mỗi bước ghi rõ mở ở **thư mục nào** (xem mục ngay dưới) | Xem mục *Cách mở terminal ở đúng thư mục* |
-| ☁️ **EC2** | Terminal đã đăng nhập vào máy chủ | Trong Git Bash gõ `ssh -i ~/his-keys/his-ec2.pem ubuntu@<IP>`. Thấy dấu nhắc `ubuntu@ip-...:~$` là đã vào. Gõ `exit` để ra |
+| ☁️ **VPS** | Terminal đã đăng nhập vào máy chủ | Trong Git Bash gõ `ssh -i ~/his-keys/his-vps his@<IP>`. Thấy dấu nhắc `his@thehos-vps:~$` là đã vào. Gõ `exit` để ra |
 | 🌐 **Web** | Trình duyệt (Chrome, Edge) | — |
 | 📝 **Editor** | VS Code hoặc Antigravity IDE | **File → Open Folder** → chọn thư mục **[Dự án]** |
 
@@ -24,7 +24,7 @@ Tài liệu dùng 4 thư mục, gọi tắt như sau:
 | **[Dự án]** | `E:\2.File_trường\4_KI1\ĐỒ ÁN MINH QUÝ\Web Hospital Management System with AI Assistant` | `compose.yaml`, `.env`, `backend`, `frontend`, `nginx`, `scripts`, `docs` |
 | **[backend]** | `E:\2.File_trường\4_KI1\ĐỒ ÁN MINH QUÝ\Web Hospital Management System with AI Assistant\backend` | `pom.xml`, `mvnw`, `Dockerfile`, `shared`, `modules`, `his-app` |
 | **[frontend]** | `E:\2.File_trường\4_KI1\ĐỒ ÁN MINH QUÝ\Web Hospital Management System with AI Assistant\frontend` | `package.json`, `src`, `vite.config.ts` |
-| **[his-keys]** | `C:\Users\<tên bạn>\his-keys` | `his-ec2.pem`, `origin.pem`, `origin.key`, `his-deploy` |
+| **[his-keys]** | `C:\Users\<tên bạn>\his-keys` | `his-vps`, `origin.pem`, `origin.key`, `his-deploy` |
 
 Máy của thành viên khác: **[Dự án]** là thư mục `Web-Hospital-Management-System-with-AI-Assistant` vừa clone ở Phần 0 bước 2, ví dụ `D:\DoAn\Web-Hospital-Management-System-with-AI-Assistant`.
 
@@ -55,10 +55,10 @@ Các file và giá trị dưới đây **không bao giờ** được commit. `.g
 
 | Thứ cần giữ kín | Để ở |
 | --- | --- |
-| Mật khẩu MySQL, JWT, Admin, khóa R2, VNPAY, Gmail | File `.env`. Máy mình: `[Dự án]\.env`. Máy chủ: `/opt/his/.env` (bản gốc giữ ở `[Dự án]\.env.production`, đã bị `.gitignore` chặn) |
-| Khóa SSH vào EC2 (`his-ec2.pem`), khóa deploy (`his-deploy`), chứng chỉ (`origin.pem`, `origin.key`) | Thư mục `C:\Users\<tên bạn>\his-keys\`, **ngoài** repo |
+| Mật khẩu MySQL, JWT, Admin, khóa R2, VNPAY, SMTP key Brevo | File `.env`. Máy mình: `[Dự án]\.env`. Máy chủ: `/opt/his/.env` (bản gốc giữ ở `[Dự án]\.env.production`, đã bị `.gitignore` chặn) |
+| Khóa SSH vào máy chủ (`his-vps`), khóa deploy (`his-deploy`), chứng chỉ (`origin.pem`, `origin.key`) | Thư mục `C:\Users\<tên bạn>\his-keys\`, **ngoài** repo |
 | Chứng chỉ trên máy chủ | `/opt/his/nginx/certs/` |
-| IP, user và khóa SSH cho deploy tự động | GitHub secrets: `EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY` |
+| IP, user và khóa SSH cho deploy tự động | GitHub secrets: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` |
 | Token R2 dùng cho sao lưu | Cấu hình rclone trên máy chủ (`~/.config/rclone/rclone.conf`) |
 
 ---
@@ -268,7 +268,7 @@ npm run dev
 
 ## Phần B — Đưa web lên `nangnguyen.me` (nhóm trưởng làm một lần)
 
-> Năm 2026-11 nhóm trưởng làm phần này cùng Claude qua dòng lệnh (`aws`, `gh`, `wrangler`, API Cloudflare). Tài liệu dưới đây là cách làm tay trên giao diện web — dùng khi cần làm lại hoặc kiểm tra. Kết quả hai cách giống nhau.
+> Năm 2026-11 nhóm trưởng làm phần này cùng Claude qua dòng lệnh (`ssh`, `gh`, `wrangler`, API Cloudflare); Droplet DigitalOcean tạo trên web. Tài liệu dưới đây là cách làm tay trên giao diện web — dùng khi cần làm lại hoặc kiểm tra. Kết quả hai cách giống nhau.
 
 Trước khi bắt đầu, tạo thư mục **[his-keys]**. **Làm** trong 💻 terminal bất kỳ:
 ```bash
@@ -317,56 +317,68 @@ mkdir -p ~/his-keys
 
 **Đúng khi**: file nháp có Account ID và 2 cặp khóa. Xóa file nháp sau khi làm xong bước 6 và bước 10.
 
-### Bước 4. Tạo máy chủ EC2
-**Mở** 🌐 <https://aws.amazon.com> → **Create an AWS account** (tài khoản mới, có credit). Đăng nhập xong vào <https://console.aws.amazon.com>.
+### Bước 4. Tạo máy chủ DigitalOcean Droplet
+Máy chủ là một Droplet của DigitalOcean (VPS Ubuntu). Giá Basic 2 GiB là 12 USD/tháng, tính theo giây. ⚠️ Droplet **tắt vẫn bị tính tiền**; muốn dừng tính tiền phải **Destroy**.
+
+**Làm** trong 💻 terminal bất kỳ — tạo khóa SSH để vào máy chủ:
+```bash
+cd ~/his-keys
+ssh-keygen -t ed25519 -f his-vps -N "" -C his-vps
+cat his-vps.pub          # copy dòng bắt đầu bằng ssh-ed25519
+```
+
+**Mở** 🌐 <https://cloud.digitalocean.com/registrations/new> → đăng ký, xác minh email, thêm thẻ hoặc PayPal theo yêu cầu.
 
 **Làm**:
-1. Góc trên phải bấm tên tài khoản → **Security credentials** → bật **MFA**.
-2. Góc trên phải chọn region **Asia Pacific (Singapore)**.
-3. Ô tìm kiếm gõ **Budgets** → **Create budget** → *Monthly cost budget* → 10 USD → điền email → **Create**. ⚠️ **Bắt buộc** làm bước này.
-4. Ô tìm kiếm gõ **EC2** → **Launch instance**, điền:
+1. Avatar → **My Account** → **Security** → bật **Two-factor authentication**.
+2. **Billing** → tab **Spend alerts** → **Create alert**: tên `thehos`, Monthly budget `15`, Scope **Total spend** → **Create**. ⚠️ **Bắt buộc** làm bước này. Đây chỉ là email cảnh báo, không tự chặn chi tiêu.
+3. **Settings** → **Security** → **SSH Keys** → **Add SSH Key** → dán dòng `his-vps.pub` vừa copy, Name `his-vps`.
+4. **Create** (góc trên phải) → **Droplets**, chọn:
 
    | Ô | Chọn |
    | --- | --- |
-   | Name | `his-ec2` |
-   | Application and OS Images | **Ubuntu Server 24.04 LTS** |
-   | Instance type | `t3.small` (2 GiB — JVM + MySQL không vừa 1 GiB) |
-   | Key pair | **Create new key pair** → tên `his-ec2`, loại ED25519, `.pem` → file tự tải về. Chuyển file vào `C:\Users\<tên bạn>\his-keys\` |
-   | Network settings | Tích **Allow SSH**, **Allow HTTPS**, **Allow HTTP** |
-   | Configure storage | `30` GiB, `gp3` |
-   | Advanced details → Credit specification | **Standard** |
+   | Region | **Singapore** (SGP1) |
+   | Image | **Ubuntu 24.04 (LTS) x64** |
+   | Size | **Basic** → **Regular** → 12 USD/mo (2 GB, 1 CPU, 50 GB SSD) — JVM + MySQL không vừa 1 GiB |
+   | Authentication | **SSH Key** → tích `his-vps` (không chọn Password) |
+   | Tùy chọn thêm | Tích **Monitoring** (miễn phí); không tích Backups (tốn thêm tiền, đã có sao lưu lên R2 ở bước 10) |
+   | Hostname | `thehos-vps` |
+   | Tags | `thehos` |
 
-5. Bấm **Launch instance** → **View all instances** → bấm vào `his-ec2`.
+   Bấm **Create Droplet**.
+5. Menu trái **Networking** → **Firewalls** → **Create Firewall**: tên `thehos-fw`; **Inbound Rules** giữ SSH 22, thêm **HTTP** 80 và **HTTPS** 443 (nguồn All IPv4, All IPv6); Outbound giữ mặc định; **Apply to Droplets** gõ tag `thehos` → **Create Firewall**.
 
-**Đúng khi**: cột *Instance state* là **Running**. Copy **Public IPv4 address**; đây là `<IP>` trong mọi lệnh phía dưới.
-
-> ⚠️ **Stop rồi Start** máy sẽ đổi IP; khi đó phải sửa bản ghi DNS ở bước 7 và secret `EC2_HOST` ở bước 8. Muốn khởi động lại thì chọn **Reboot** (IP giữ nguyên).
+**Đúng khi**: Droplet ở trạng thái **On**, Firewall `thehos-fw` gắn 1 Droplet. Copy **ipv4** của Droplet; đây là `<IP>` trong mọi lệnh phía dưới. IP giữ nguyên khi tắt/bật hay khởi động lại, chỉ mất khi Destroy.
 
 ### Bước 5. Cài máy chủ bằng script có sẵn
-**Mở** 💻 terminal ở thư mục **[Dự án]**. Script nằm ở `scripts/setup-ec2.sh`.
+**Mở** 💻 terminal ở thư mục **[Dự án]**. Script nằm ở `scripts/setup-vps.sh`.
+
+Droplet mới chỉ có user `root`. Script tạo user `his` (dùng chung khóa SSH của root), cài Docker, swap, chrony, rclone, tạo `/opt/his`, cron sao lưu, rồi **tắt đăng nhập root**.
 
 **Làm**:
 ```bash
-chmod 400 ~/his-keys/his-ec2.pem
-scp -i ~/his-keys/his-ec2.pem scripts/setup-ec2.sh ubuntu@<IP>:~
-ssh -i ~/his-keys/his-ec2.pem ubuntu@<IP>        # lần đầu hỏi "Are you sure..." → gõ yes
+scp -i ~/his-keys/his-vps scripts/setup-vps.sh root@<IP>:~
+ssh -i ~/his-keys/his-vps root@<IP>        # lần đầu hỏi "Are you sure..." → gõ yes
 ```
-Lúc này đang ở ☁️ EC2. Gõ tiếp:
+Lúc này đang ở ☁️ VPS (user root). Gõ tiếp:
 ```bash
-sudo bash setup-ec2.sh      # cài Docker, swap, chrony, rclone, tạo /opt/his, cron sao lưu — khoảng 3–5 phút
-exit
+bash setup-vps.sh      # khoảng 3–5 phút
+```
+**Chưa** gõ `exit`. Mở một 💻 terminal **mới** và thử vào bằng user `his`:
+```bash
+ssh -i ~/his-keys/his-vps his@<IP>
 ```
 
-**Đúng khi**: script in `Xong` ở cuối, không có dòng lỗi màu đỏ.
+**Đúng khi**: script in `Xong` ở cuối, không có dòng lỗi màu đỏ, và terminal mới vào được `his@thehos-vps`. Lúc đó mới `exit` phiên root. Từ nay `ssh root@<IP>` bị từ chối là đúng.
 
 ### Bước 6. Tạo `.env` trên máy chủ
 **Mở** 📝 editor → file `.env.example` ở thư mục **[Dự án]** → **Ctrl+A**, **Ctrl+C** để copy hết.
 
 **Làm** trong 💻 terminal bất kỳ:
 ```bash
-ssh -i ~/his-keys/his-ec2.pem ubuntu@<IP>
+ssh -i ~/his-keys/his-vps his@<IP>
 ```
-Ở ☁️ EC2:
+Ở ☁️ VPS:
 ```bash
 nano /opt/his/.env
 ```
@@ -382,7 +394,7 @@ Chuột phải để dán nội dung vừa copy, rồi dùng phím mũi tên đi
 | `HIS_R2_ACCESS_KEY`, `HIS_R2_SECRET_KEY` | Cặp khóa **token app** ở bước 3 |
 | `HIS_R2_BUCKET` | `thehos-prod` |
 | `HIS_VNPAY_TMN_CODE`, `HIS_VNPAY_HASH_SECRET` | Mã và khóa VNPAY sandbox của nhóm (bước 11) |
-| `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD` | Gmail của nhóm và App Password (bước 12) |
+| `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD`, `HIS_EMAIL_NGUOI_GUI` | Login, SMTP key Brevo và địa chỉ gửi (bước 12); `SPRING_MAIL_HOST`/`PORT` giữ `smtp-relay.brevo.com`/`2525` |
 
 Lưu bằng **Ctrl+O** → **Enter**, thoát bằng **Ctrl+X**. Gõ tiếp:
 ```bash
@@ -394,7 +406,7 @@ exit
 **Làm** trong 💻 terminal bất kỳ (lệnh `cd ~/his-keys` đưa terminal tới **[his-keys]**):
 ```bash
 cd ~/his-keys
-scp -i his-ec2.pem origin.pem origin.key ubuntu@<IP>:/opt/his/nginx/certs/
+scp -i his-vps origin.pem origin.key his@<IP>:/opt/his/nginx/certs/
 ```
 
 **Mở** 🌐 <https://dash.cloudflare.com> → `nangnguyen.me` → **DNS → Records** → **Add record**:
@@ -413,7 +425,7 @@ Bấm **Save**.
 ```bash
 cd ~/his-keys
 ssh-keygen -t ed25519 -f his-deploy -N ""
-ssh -i his-ec2.pem ubuntu@<IP> "cat >> ~/.ssh/authorized_keys" < his-deploy.pub
+ssh -i his-vps his@<IP> "cat >> ~/.ssh/authorized_keys" < his-deploy.pub
 cat his-deploy
 ```
 Bôi đen **toàn bộ** nội dung vừa in, từ `-----BEGIN` tới `-----END ...-----`, rồi copy.
@@ -422,9 +434,9 @@ Bôi đen **toàn bộ** nội dung vừa in, từ `-----BEGIN` tới `-----END 
 
 | Name | Secret |
 | --- | --- |
-| `EC2_HOST` | `<IP>` |
-| `EC2_USER` | `ubuntu` |
-| `EC2_SSH_KEY` | Nội dung vừa copy |
+| `VPS_HOST` | `<IP>` |
+| `VPS_USER` | `his` |
+| `VPS_SSH_KEY` | Nội dung vừa copy |
 
 Thêm 2 secret cho bước đưa frontend lên Pages (`CLOUDFLARE_API_TOKEN` là token đã tạo ở Phần B, Account ID ở trang chủ Cloudflare, cột phải):
 
@@ -446,7 +458,7 @@ Frontend **không** nối Git với Pages: workflow **Deploy** (chạy từ nhá
 **Đúng khi**: 🌐 <https://nangnguyen.me> hiện trang chủ TheHos; đăng nhập Admin được, vào **Quản trị → Khoa** thêm và sửa được.
 
 ### Bước 10. Bật sao lưu CSDL hằng đêm
-Cron 02:00 đã được `setup-ec2.sh` cài sẵn; chỉ còn cấu hình rclone. **Làm** trong 💻 terminal ở **[Dự án]**: `scp -i ~/his-keys/his-ec2.pem scripts/*.sh ubuntu@<IP>:/opt/his/scripts/` rồi `ssh -i ~/his-keys/his-ec2.pem ubuntu@<IP>`. Ở ☁️ EC2, thay 3 chỗ `<...>` bằng **token sao lưu** và Account ID ở bước 3:
+Cron 02:00 đã được `setup-vps.sh` cài sẵn; chỉ còn cấu hình rclone. **Làm** trong 💻 terminal ở **[Dự án]**: `scp -i ~/his-keys/his-vps scripts/*.sh his@<IP>:/opt/his/scripts/` rồi `ssh -i ~/his-keys/his-vps his@<IP>`. Ở ☁️ VPS, thay 3 chỗ `<...>` bằng **token sao lưu** và Account ID ở bước 3:
 ```bash
 R2_ACCOUNT_ID=<Account ID> R2_SAO_LUU_ACCESS_KEY=<Access Key ID sao lưu> R2_SAO_LUU_SECRET_KEY=<Secret sao lưu> \
   bash /opt/his/scripts/cau-hinh-rclone.sh
@@ -472,18 +484,24 @@ cd /opt/his && bash scripts/khoi-phuc-mysql.sh his-<ngày>.sql.gz his_thu   # in
 
 **Đúng khi**: đặt khám thử trên `https://nangnguyen.me`, thanh toán bằng thẻ test của VNPAY (trong email) → về trang kết quả "Thanh toán thành công"; ☁️ `docker compose logs backend | grep -i ipn` thấy IPN gọi vào.
 
-### Bước 12. Gmail gửi OTP
-**Mở** 🌐 tài khoản Gmail **riêng của nhóm** → <https://myaccount.google.com/security> → bật **Xác minh 2 bước** → <https://myaccount.google.com/apppasswords> → tạo App Password tên `TheHos` → copy chuỗi 16 ký tự.
+### Bước 12. Brevo gửi email OTP
+DigitalOcean chặn cổng SMTP 25/465/587 trên mọi Droplet (<https://docs.digitalocean.com/support/why-is-smtp-blocked/>), nên máy chủ gửi OTP qua **Brevo** cổng **2525** (gói free khoảng 300 email/ngày). Máy mình vẫn dùng được Gmail + App Password (`smtp.gmail.com`, `587`).
 
-**Làm**: điền `SPRING_MAIL_USERNAME=<gmail của nhóm>`, `SPRING_MAIL_PASSWORD=<16 ký tự, bỏ dấu cách>` vào `/opt/his/.env`, rồi ☁️ `cd /opt/his && docker compose up -d`.
+**Mở** 🌐 <https://www.brevo.com> → **Sign up free** → xác minh email; Brevo có thể duyệt tài khoản trước khi cho gửi.
 
-**Đúng khi**: đăng ký tài khoản bệnh nhân trên `https://nangnguyen.me` nhận được email OTP.
+**Làm**:
+1. **Senders, Domains & Dedicated IPs** → **Domains** → **Add a domain** → `nangnguyen.me` → thêm các bản ghi DNS Brevo đưa ra (TXT `brevo-code`, DKIM, DMARC) vào 🌐 Cloudflare → `nangnguyen.me` → **DNS → Records** (Proxy status: **DNS only**) → quay lại Brevo bấm **Authenticate**.
+2. Tab **Senders** → **Add a sender**: `TheHos Hospital`, `no-reply@nangnguyen.me`.
+3. **SMTP & API** → **SMTP** → **Generate a new SMTP key** → copy key (chỉ hiện một lần) và dòng **Login** (`...@smtp-brevo.com`).
+4. Điền vào `/opt/his/.env`: `SPRING_MAIL_HOST=smtp-relay.brevo.com`, `SPRING_MAIL_PORT=2525`, `SPRING_MAIL_USERNAME=<Login>`, `SPRING_MAIL_PASSWORD=<SMTP key>`, `HIS_EMAIL_NGUOI_GUI=no-reply@nangnguyen.me`, rồi ☁️ `cd /opt/his && docker compose up -d`.
+
+**Đúng khi**: đăng ký tài khoản bệnh nhân trên `https://nangnguyen.me` nhận được email OTP từ `no-reply@nangnguyen.me`.
 
 ---
 
 ## Phần C — Hai nhánh `baseline` và `main`
 
-| Nhánh | Chứa gì | CI (test) | Deploy lên EC2 + Pages |
+| Nhánh | Chứa gì | CI (test) | Deploy lên VPS + Pages |
 | --- | --- | --- | --- |
 | `baseline` | Bản hoàn chỉnh nhóm trưởng dựng — bản demo, bản đang chạy trên `nangnguyen.me` | Có (mọi PR vào `baseline`) | **Có** — mỗi lần `baseline` đổi |
 | `main` | Các thành viên đưa lại code theo nhiệm vụ của mình (skill `day-ma`, `nhiemvuthanhvien.md`) | Có (mọi PR vào `main` và mỗi lần `main` đổi) | **Không** — `main` thay đổi không ảnh hưởng `baseline` và VPS |
@@ -503,17 +521,17 @@ Cả hai nhánh được bảo vệ bằng ruleset (`scripts/bao-ve-nhanh.sh`): 
 | Thấy gì | Làm gì |
 | --- | --- |
 | `docker compose` báo không kết nối được Docker | Mở Docker Desktop, chờ **Engine running** |
-| Log backend có `Access denied for user 'his'` | Đã đổi mật khẩu MySQL trong `.env` sau lần chạy đầu; MySQL vẫn giữ mật khẩu cũ. Trên máy mình: 💻 terminal ở **[Dự án]** chạy `docker compose down -v` rồi `docker compose up -d` (mất dữ liệu dev, backend tự seed lại). ⚠️ **Không** chạy `down -v` trên EC2; ở đó phải trả lại mật khẩu cũ |
+| Log backend có `Access denied for user 'his'` | Đã đổi mật khẩu MySQL trong `.env` sau lần chạy đầu; MySQL vẫn giữ mật khẩu cũ. Trên máy mình: 💻 terminal ở **[Dự án]** chạy `docker compose down -v` rồi `docker compose up -d` (mất dữ liệu dev, backend tự seed lại). ⚠️ **Không** chạy `down -v` trên VPS; ở đó phải trả lại mật khẩu cũ |
 | Container `backend` không lên `healthy` trên máy mình | 💻 `docker compose logs backend`, thường do sai hoặc thiếu dòng trong `.env` (Phần A2 bước 3). `HIS_JWT_KEY` thiếu hoặc ngắn hơn 32 ký tự thì backend dừng ngay |
 | Log backend có `Found non-empty schema(s) ... without schema history table` | CSDL do bản .NET cũ tạo → xem ghi chú đầu Phần A2 (chỉ trên máy mình) |
 | Log backend có `Schema-validation: missing column` / `wrong column type` | Entity Java lệch bảng → thêm file Flyway mới cho khớp (Phần A, ghi chú cuối) |
 | Sau khi đổi tên hoặc chuyển thư mục dự án, `nginx` báo `(unhealthy)`, <http://localhost/health> không mở được | Container cũ vẫn trỏ tới thư mục cũ; Docker tự tạo thư mục rỗng ở đường dẫn cũ nên NGINX không có cấu hình. 💻 terminal ở **[Dự án]** (thư mục **mới**) chạy `docker compose up -d --build`. Thư mục rỗng ở đường dẫn cũ có thể xóa tay sau đó |
 | `docker compose up` báo cổng `80` hoặc `3317` đã bị dùng | Đang chạy dự án khác chiếm cổng. Tắt dự án đó trong Docker Desktop → **Containers**, rồi chạy lại |
-| Quên mật khẩu Admin trên máy mình | 💻 ở **[Dự án]**: `docker compose down -v` rồi `docker compose up -d --build`. ⚠️ Mất **toàn bộ** dữ liệu dev; backend tạo lại bảng và Admin theo `HIS_SEED_ADMIN_*` trong `.env` hiện tại. **Không** làm trên EC2 |
-| Cloudflare **521** | ☁️ `cd /opt/his && docker compose ps`; 🌐 kiểm EC2 → Security Group đã mở cổng 443 |
+| Quên mật khẩu Admin trên máy mình | 💻 ở **[Dự án]**: `docker compose down -v` rồi `docker compose up -d --build`. ⚠️ Mất **toàn bộ** dữ liệu dev; backend tạo lại bảng và Admin theo `HIS_SEED_ADMIN_*` trong `.env` hiện tại. **Không** làm trên VPS |
+| Cloudflare **521** | ☁️ `cd /opt/his && docker compose ps`; 🌐 kiểm DigitalOcean → **Networking → Firewalls** → `thehos-fw` đã mở cổng 443 và gắn Droplet |
 | Cloudflare **526** | Chứng chỉ sai hoặc thiếu → làm lại bước 2 và bước 7 của Phần B |
 | **502 Bad Gateway** | ☁️ `cd /opt/his && docker compose logs --tail 100 backend` |
 | Trình duyệt báo lỗi **CORS** | ☁️ sửa dòng `HIS_CORS_ALLOWED_ORIGINS` trong `/opt/his/.env`, rồi `cd /opt/his && docker compose up -d` |
-| Không nhận được email OTP | ☁️ `docker compose logs backend | grep -i email`: `CHUA_CAU_HINH_EMAIL` → thiếu `SPRING_MAIL_*`; `GUI_EMAIL_THAT_BAI` → sai App Password (Phần B bước 12) |
-| Workflow Deploy đỏ ở bước SSH | IP EC2 đã đổi → sửa secret `EC2_HOST` và bản ghi DNS `api` |
+| Không nhận được email OTP | ☁️ `docker compose logs backend | grep -i email`: `CHUA_CAU_HINH_EMAIL` → thiếu `SPRING_MAIL_*`; `GUI_EMAIL_THAT_BAI` → sai Login/SMTP key Brevo, cổng không phải 2525, hoặc tài khoản Brevo chưa được duyệt (Phần B bước 12) |
+| Workflow Deploy đỏ ở bước SSH | Kiểm secret `VPS_HOST` đúng IP Droplet, `VPS_USER` là `his`, `VPS_SSH_KEY` đủ từ `-----BEGIN` tới `-----END`; khóa `his-deploy.pub` có trong `/home/his/.ssh/authorized_keys`. Droplet đã Destroy rồi tạo lại thì IP mới → sửa `VPS_HOST` và bản ghi DNS `api` |
 | Sửa `.env` mà không thấy tác dụng | Chạy `docker compose up -d` ở thư mục chứa `.env` đó |

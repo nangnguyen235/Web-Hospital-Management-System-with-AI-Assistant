@@ -13,7 +13,7 @@ Nghiệp vụ và thiết kế CSDL tham khảo [TheDuckHospital](https://github
 | --- | --- |
 | Backend | ASP.NET Core .NET 10, Modular Monolith + Clean Architecture (6 module × 4 tầng + Contracts), EF Core + MySQL 8, MediatR |
 | Frontend | React + Vite + TypeScript + MUI, triển khai trên Cloudflare Pages |
-| Hạ tầng | Docker Compose (nginx, backend, mysql) trên Amazon EC2, Cloudflare DNS/SSL/R2, GitHub Actions + GHCR |
+| Hạ tầng | Docker Compose (nginx, backend, mysql) trên VPS DigitalOcean Droplet, Cloudflare DNS/SSL/R2, GitHub Actions + GHCR |
 
 ## Cấu trúc
 
@@ -39,7 +39,7 @@ cd backend && dotnet test         # gồm architecture test chặn tham chiếu 
 
 Đã chạy trước đó (giữ `.env` và dữ liệu cũ): `git pull` → `docker compose up -d --build` → `cd frontend && npm run dev`. Chi tiết ở Phần A2 của [docs/trien-khai.md](docs/trien-khai.md).
 
-Triển khai lên Cloudflare + EC2: xem [docs/trien-khai.md](docs/trien-khai.md).
+Triển khai lên Cloudflare + DigitalOcean: xem [docs/trien-khai.md](docs/trien-khai.md).
 
 ## Thành viên
 

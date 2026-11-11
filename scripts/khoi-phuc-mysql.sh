@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Khôi phục MySQL từ một bản sao lưu (4-docker-compose/docker-compose.md mục 6 — thử ít nhất một lần trước buổi bảo vệ).
-# Cách dùng (trên EC2, trong /opt/his):
+# Cách dùng (trên VPS, trong /opt/his):
 #   bash scripts/khoi-phuc-mysql.sh his-20261201.sql.gz            # lấy từ /var/backups/his, không có thì tải từ R2
 #   bash scripts/khoi-phuc-mysql.sh his-20261201.sql.gz his_thu     # khôi phục sang CSDL khác để kiểm, không đè dữ liệu thật
 # Khôi phục vào CSDL đang chạy sẽ GHI ĐÈ dữ liệu — script hỏi xác nhận trước.

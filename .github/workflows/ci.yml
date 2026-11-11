@@ -1,5 +1,5 @@
 # CI cho mọi Pull Request vào main/baseline và mỗi lần main thay đổi: đỏ thì không merge.
-# CHỈ kiểm thử, KHÔNG deploy — deploy lên EC2 + Pages chỉ chạy từ nhánh baseline (deploy.yml).
+# CHỈ kiểm thử, KHÔNG deploy — deploy lên VPS + Pages chỉ chạy từ nhánh baseline (deploy.yml).
 name: CI
 
 on:
